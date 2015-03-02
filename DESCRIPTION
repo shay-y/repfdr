@@ -1,0 +1,14 @@
+Package: repfdr
+Type: Package
+Title: Replicability Analysis for Multiple Studies of High Dimension
+Version: 1.1-1
+Author: Ruth Heller, Shachar Kaufman, Shay Yaacoby, Daniel Yekutieli
+Maintainer: Ruth Heller <ruheller@gmail.com>
+Description: Estimation of Bayes and local Bayes false discovery rates for
+    replicability analysis.
+License: GPL (>= 2)
+Depends: R (>= 2.10)
+Packaged: 2014-10-02 12:53:26 UTC; Shay
+NeedsCompilation: yes
+Repository: CRAN
+Date/Publication: 2014-10-02 15:41:10
