@@ -25,13 +25,7 @@ head(SNPlocations)
 download.file('http://www.math.tau.ac.il/~ruheller/repfdr_RData/zmat.RData',destfile = "zmat.RData")
 load(file = "zmat.RData")
 
-# download.file(url = "http://cran.r-project.org/src/contrib/Archive/locfdr/locfdr_1.1-7.tar.gz",
-#           destfile = "locfdr_1.1-7.tar.gz")
-# install.packages("locfdr_1.1-7.tar.gz", type="source", repos=NULL)
-# unlink("locfdr_1.1-7.tar.gz")
-library(locfdr)
-
-input.to.repfdr <- ztobins(zmat, 3, plot = TRUE, df = 15)
+input.to.repfdr <- ztobins(zmat, 3, df= 15)
 pbz <- input.to.repfdr$pdf.binned.z
 bz  <- input.to.repfdr$binned.z.mat
 }

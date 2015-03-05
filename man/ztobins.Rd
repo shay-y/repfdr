@@ -4,10 +4,11 @@
 Binning of z-scores and estimation of the probabilities in each bin for the null and non-null states.
 }
 \description{
-For each study, the function discretizes the z-scores into bins and estimates the probabilities in each bin for the null and non-null states using the function \code{locfdr}.
+For each study, the function discretizes the z-scores into bins and estimates the probabilities in each bin for the null and non-null states.
 }
 \usage{
-ztobins(zmat, n.association.status = 3, n.bins = 120,nulltype = 0, ...)
+ztobins(zmat, n.association.status = 3, n.bins = 120, type = 0,
+        df = 7, central.prop = 0.5)
 }
 \arguments{
   \item{zmat}{
@@ -17,13 +18,16 @@ Matrix of z-scores of the features (in rows) in each study (columns).
 either 2 for no-association\\association or 3 for no-associtation\\negative-association\\positive-association.
 }
   \item{n.bins}{
-Number of bins in the discretization of the z-score axis.
+Number of breaks in the discretization of the z-score axis (the number of bins is \code{n.bins- 1}). If the number of z-scores per study is small, we set \code{n.bins} to a number lower than the default of 120 (about equals to the square root of the number of z-scores).
 }
-  \item{nulltype}{
-Type of null hypothesis assumed in estimating \code{f0(z)}. \code{0} (default) is the theoretical null N(0,1). This is an argument to pass to \code{locfdr}. For other values, see documentation of \code{locfdr}.
+  \item{type}{
+Type of fitting used for f; 0 is a natural spline, 1 is a polynomial, in either case with degrees of freedom \code{df} (so total degrees of freedom including the intercept is \code{df+1}).
 }
-  \item{\dots}{
-Arguments to pass to \code{locfdr}. See \code{locfdr} package for details.
+  \item{df}{
+Degrees of freedom for fitting the estimated density f(z).
+}
+  \item{central.prop}{
+Central proportion of the z-scores used like the area of zero-assumption to estimate pi0.
 }
 }
 \details{
@@ -43,24 +47,19 @@ A matrix of the bin numbers for each the z-scores (rows) in each study (columns)
 }
 \examples{
 \dontrun{
-# download.file(url = "http://cran.r-project.org/src/contrib/Archive/locfdr/locfdr_1.1-7.tar.gz",
-#           destfile = "locfdr_1.1-7.tar.gz")
-# install.packages("locfdr_1.1-7.tar.gz", type="source", repos=NULL)
-# unlink("locfdr_1.1-7.tar.gz")
-library(locfdr)
 
 # three association states case (H in {-1,0,1}):
 download.file('http://www.math.tau.ac.il/~ruheller/repfdr_RData/zmat.RData',destfile = "zmat.RData")
 load(file = "zmat.RData")
 
-input.to.repfdr3 <- ztobins(zmat, 3, plot = TRUE, df = 15)
+input.to.repfdr3 <- ztobins(zmat, 3, df = 15)
 pbz    <- input.to.repfdr3$pdf.binned.z
 bz     <- input.to.repfdr3$binned.z.mat
 
 # two association states case (H in {0,1}):
 data(zmat_sim)
 
-input.to.repfdr <- ztobins(zmat_sim, 2, plot = TRUE, df = 15)
+input.to.repfdr <- ztobins(zmat_sim, 2)
 pbz_sim    <- input.to.repfdr$pdf.binned.z
 bz_sim     <- input.to.repfdr$binned.z.mat
 }

@@ -17,13 +17,7 @@ data(zmat_sim)
 head(zmat_sim)
 
 \dontrun{
-  # download.file(url = "http://cran.r-project.org/src/contrib/Archive/locfdr/locfdr_1.1-7.tar.gz",
-  #           destfile = "locfdr_1.1-7.tar.gz")
-  # install.packages("locfdr_1.1-7.tar.gz", type="source", repos=NULL)
-  # unlink("locfdr_1.1-7.tar.gz")
-  library(locfdr)
-
-  input.to.repfdr <- ztobins(zmat_sim, 2, plot = TRUE, df = 15)
+  input.to.repfdr <- ztobins(zmat_sim, 2)
   pbz_sim1 <- input.to.repfdr$pdf.binned.z
   bz_sim1  <- input.to.repfdr$binned.z.mat
   
