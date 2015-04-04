@@ -93,6 +93,7 @@ true.assoc <- rowSums(hmat_sim) >= 1
 # Compute the false discovery proportion (FDP) for association:
 sum(Rej * !true.assoc) / sum(true.assoc) 
 
+\dontrun{
 #### Example 2: SNPs data; each SNP in each study has three association states,
 ####            negative, null, or positive: 
 
@@ -125,10 +126,12 @@ output.meta <- repfdr(pbz, bz, "meta-analysis", Pi.previous.result = Pi)
 BayesFdr.meta <- output.meta$mat[,"Fdr"]
 Rej <- sum(BayesFdr.meta <= 0.05)
 sum(Rej)
+}
+
+## manhattan plot (ploting can take a while):
+# code for manhattan plot by Stephen Turner (see copyrights at the source code manhattan.r)
 
 \dontrun{ 
-  ## manhattan plot (ploting can take a while):
-  # code for manhattan plot by Stephen Turner (see copyrights at the source code manhattan.r)
   data(SNPlocations)
   par(mfrow=c(2,1))
   # Replication 

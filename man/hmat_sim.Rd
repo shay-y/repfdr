@@ -18,7 +18,7 @@ data(hmat_sim)
 m <- nrow(hmat_sim)
 set.seed(12)
 zmat_sim1  <- matrix(rnorm(n=3*m,mean=hmat_sim*3),nrow=m,ncol=3)
-rm(f,m,H)
+rm(m,H)
 
 data(zmat_sim)
 stopifnot(all.equal(zmat_sim1,zmat_sim))
