@@ -13,3 +13,5 @@ Packaged: 2014-10-02 12:53:26 UTC; Shay
 NeedsCompilation: yes
 Repository: CRAN
 Date/Publication: 2014-10-02 15:41:10
+URL: http://github.com/shay-y/repfdr
+BugReports: http://github.com/shay-y/repfdr/issues
