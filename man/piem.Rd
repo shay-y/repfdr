@@ -50,7 +50,7 @@ data(Pi)
 stopifnot(all.equal(Pi,Pi1))
 
 # simulation data:
-data(binned_zmat)
+data(binned_zmat_sim)
 output_piem_sim <- piem(pbz_sim, bz_sim)
 Pi_sim <- output_piem_sim$last.iteration
 

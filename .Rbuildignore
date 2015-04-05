@@ -1,3 +1,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^packrat/
+^cran-comments\.md$
+^\.travis\.yml$
