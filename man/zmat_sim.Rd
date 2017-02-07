@@ -17,7 +17,7 @@ data(zmat_sim)
 head(zmat_sim)
 
 \dontrun{
-  input.to.repfdr <- ztobins(zmat_sim, 2)
+  input.to.repfdr <- ztobins(zmat_sim, 2 )
   pbz_sim1 <- input.to.repfdr$pdf.binned.z
   bz_sim1  <- input.to.repfdr$binned.z.mat
   

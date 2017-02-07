@@ -5,12 +5,15 @@
 Bayes and local Bayes false discovery rate  estimation for replicability analysis
 }
 \description{
-Estimate Bayes and local Bayes fasle discovery rates (FDRs) from multiple studies, for replicability analysis and for meta-analysis, as presented in Heller and Yekutieli (see reference below). 
+Estimate Bayes and local Bayes false discovery rates (FDRs) from multiple studies, for replicability analysis and for meta-analysis, as presented in Heller and Yekutieli (see reference below). 
 } 
 \usage{
 repfdr(pdf.binned.z, binned.z.mat,
-       non.null = c("replication", "meta-analysis", "user.defined"),
-       non.null.rows = NULL,Pi.previous.result = NULL, control = em.control())
+       non.null = c("replication", "meta-analysis",
+       "user.defined"),
+       non.null.rows = NULL,Pi.previous.result = NULL,
+       control = em.control(), clusters = NULL, 
+       clusters.ldr.report=NULL, clusters.verbose=T)
 }
 \arguments{
   \item{pdf.binned.z}{
@@ -33,6 +36,15 @@ An optional Vector of probabilities for each association status. If \code{NULL},
   \item{control}{
 List of control parameters to pass to the EM algorithm. See \code{\link{em.control}}.
 }
+\item{clusters}{ Used for performing analysis in each cluster, and than aggregating results together.Default value is \code{NULL} (no clusters in data). To use clusters, argument must be vector of integer, filled with number from 1 to wanted number of clusters. Vector is of length of number of studies, where \code{clusters[i]} is the cluster membership of the ith study.
+  NULL
+}
+\item{clusters.ldr.report}{
+  Sets whether local fdr values (available through the function \code{ldr} for non clustered data) should be displayed with the output. Default value is \code{NULL} (no ldr values reported). Other options are \code{'ALL'} (all ldr valeus are reported) or a vector of integers for the indices of the SNPs to be reported)
+}
+\item{clusters.verbose}{
+  if set to \code{TRUE}, messages will be printed to screen regarding the state of the calculation (which cluster is currently being processes, and aggregation procecdure by SNP). Default is \code{FALSE}
+}
 }
 \details{
 For \code{N} studies, each examining the same \code{M} features, the binned z-scores and the (estimated) probabilities under the null and non-null states in each study are given as input. 
@@ -44,10 +56,23 @@ The function calls \code{\link{piem}}  for the computation of the probabilities 
 The function calls \code{\link{ldr}} for the computation of the conditional probability of each of the vectors of association status in the null set given the binned z-scores. The null set contains the rows in \code{\link{hconfigs}(N,x)} that:  are excluded from \code{non.null.rows} if \code{non.null} is \code{user.defined};  that are non-zero if \code{non.null} is \code{meta-analysis}; that contain at most one 1 if \code{non.null} is \code{replication} and \code{x=2}; that contain at most one 1 or one -1 if \code{non.null} is \code{replication} and \code{x=3}. 
 
 The local Bayes FDR is estimated to be the sum of conditional probabilities in the null set for each feature. The empirical Bayes FDR is the average of all local Bayes FDRs that are at most the value of the local Bayes FDR for each feature. The list of discoveries at level q are all features with empirical Bayes FDR at most q.
+
+If many studies are available, one may not be able to compute RepFDR directly at the original data. If however, different groups of studies are known to be independent (e.g., if  a SNP is non null for studies 1,2 is independent of the SNP being non null in studies 3,4) one may Run RepFDR in each cluster seperatly and then aggregate the results. This is done by providing a vector for the \code{clusters} argument, with an integer value stating the cluster membership for each study.
+See the values section below for the results returned from this function, when partitioning the data to clusters.
+See vignette('RepFDR') for a complete example, on how to run RepFDR in clusters.
 }
 \value{
   \item{mat}{An \code{Mx2} Matrix with a row for each feature (\code{M} rows) and two columns, the estimated local Bayes FDR (fdr) and the estimated Bayes FDR (Fdr).}
-  \item{Pi}{Vector of the estimated probabilities for each of the \code{x^N} possible vectors of association status.}
+  \item{Pi}{Vector of the estimated probabilities for each of the \code{x^N} possible vectors of association status. If \code{clusters} is not \code{NULL}, A matrix with number of rows being \code{choose(2+nr_studies,2)} (for \code{n.association} being 3) or \code{choose(1+nr_studies,1)} (for \code{n.association} being 3). The last column represents an aggregated probability over all combintaions for row.\}
+\item{repfdr.mat.percluster}{
+Returned if \code{clusters} is not \code{NULL}. A list of the \code{mat} values returned from the RepFDR analysis, per cluster.
+}
+\item{repfdr.Pi.percluster}{
+Returned if \code{clusters} is not \code{NULL}. A list of the \code{Pi} values returned from the RepFDR analysis, per cluster.
+}
+\item{ldr}{
+Returned if \code{clusters.ldr.report} is not \code{NULL}. A matrix with number of rows being \code{choose(2+nr_studies,2)} (for \code{n.association} being 3) or \code{choose(1+nr_studies,1)} (for \code{n.association} being 3). Each row holds the local fdr values for a combination of non null values, for the reported SNPs. The first three columns count the number of studies for each reported state (number of null studies, number of non null studies). Other values in the row give the local fdr value, per reported SNP, for the specificed system of hypotheses.
+}
 }
 \references{
 Heller, R., & Yekutieli, D. (2014). Replicability analysis for genome-wide association studies. \emph{The Annals of Applied Statistics}, 8(1), 481-498.
@@ -55,7 +80,7 @@ Heller, R., & Yekutieli, D. (2014). Replicability analysis for genome-wide assoc
 Heller, R., Yaacoby, S., & Yekutieli, D. (2014). repfdr: a tool for replicability analysis for genome-wide association studies. \emph{Bioinformatics}, btu434.
 }
 \author{
-Ruth Heller, Shachar Kaufman, Shay Yaacoby, Daniel Yekutieli.
+Ruth Heller, Shachar Kaufman, Shay Yaacoby, Barak Brill, Daniel Yekutieli.
 }
 \examples{
 #### Example 1: a simulation; each feature in each study has two association states,

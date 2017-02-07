@@ -1,5 +1,3 @@
-export(repfdr,piem,ldr,hconfigs,em.control,ztobins,manhattan)
 useDynLib(repfdr)
-
-
-
+export(repfdr,piem,ldr,hconfigs,em.control,ztobins,manhattan,plot.diagnostics)
+importFrom(Rcpp, evalCpp)
