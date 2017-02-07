@@ -3,6 +3,7 @@ This is a resubmission. In this version we have:
 
 * added LF at the end of makevar files
 
+
 ### Test environments
 * local Windows x86_64-w64-mingw32 (64-bit), R 3.1.3
 * on travis-ci  x86_64-pc-linux-gnu (64-bit), R 3.1.3
