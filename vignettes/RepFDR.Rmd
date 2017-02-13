@@ -161,23 +161,29 @@ View(res$Pi)
 # we display the results
 
 #how many are significant after correcting to multiplicity
-adj.p.val = (p.adjust(res$mat[,2],method='BH'))
-table(adj.p.val)
-Fdr_reject_level = max(res$mat[which(adj.p.val<=0.05),2])
+Fdr = res$mat[,2]
 
 ```
-The Fdr reject level after adjusting for multilicity is 0.0004123115
 
-We draw a manhattan plot for the SNPS decided as significant
+
+We draw a manhattan plot for the SNPS with lowered Fdr
 
 ```{r,eval= FALSE}
 
 #Manhattan plots
 #first 2400 are the non null
-plot(-log10(res$mat[,2]),ylab = '-log(Fdr)',xlab = 'SNP Index',
+plot(-log10(Fdr),ylab = '-log(Fdr)',xlab = 'SNP Index',
      col = c(rep(1,2400),rep(4,1e5-2400)),
      main = 'Manhattan plot',cex=0.2,pch=2)
-abline(h = -log10(Fdr_reject_level),col = 2)
+abline(h = -log10(0.05),col = 2)
+
+Reported = which(Fdr<=0.05)
+length(Reported)
+FP = Reported[Reported>2400]
+length(FP)
+
 ```
+
+Where we have 1174 reported SNPs, 70 of which are false positive.
 
 ![](Manhattan.png)

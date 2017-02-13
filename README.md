@@ -7,8 +7,6 @@ Replicability Analysis for Multiple Studies of High Dimension. Estimates Bayes a
 
 For latest CRAN (stable build), run:
 
-
-
 ```r
 install.packages("repfdr")
 ```

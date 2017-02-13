@@ -174,10 +174,10 @@ ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df 
         
         
         if (n.association.status == 2){
-          proportions[1,i] = sum(f0)
-          proportions[2,i] = sum(p1f1)
-          proportions[,i] = proportions[,i]/sum(proportions[,i])
-          
+          proportions[1,i] = 1-sum(p1f1)/sum(f)
+          proportions[2,i] = sum(p1f1)/sum(f)
+          #proportions[,i] = proportions[,i]/sum(proportions[,i])
+           
           pdf.binned.z[i, , 1] <- f0/sum(f0)
           pdf.binned.z[i, , 2] <- p1f1/sum(p1f1)
         }
@@ -187,13 +187,14 @@ ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df 
           
           
           pdf.binned.z[i, , 2] <- f0/sum(f0)
-          pdf.binned.z[i, , 1] <- ifelse(x < 0, p1f1, rep(0, 
+          pdf.binned.z[i, , 1] <- ifelse(x <= 0, p1f1, rep(0, 
                                                           n.bins - 1))
           pdf.binned.z[i, , 3] <- ifelse(x > 0, p1f1, rep(0, 
                                                           n.bins - 1))
-          proportions[1,i] = sum(pdf.binned.z[i,, 1])
-          proportions[3,i] = sum(pdf.binned.z[i,, 3])
-          proportions[,i] = proportions[,i]/sum(proportions[,i])
+          proportions[1,i] = sum(p1f1[x <= 0]/sum(f))
+          proportions[3,i] = sum(p1f1[x > 0]/sum(f))
+          proportions[2,i] = 1- sum(p1f1)/sum(f)
+          #proportions[,i] = proportions[,i]/sum(proportions[,i])
           
           pdf.binned.z[i, , 1] <- pdf.binned.z[i, , 1]/sum(pdf.binned.z[i, 
                                                                         , 1])
