@@ -26,6 +26,9 @@ repfdr <- function(pdf.binned.z, binned.z.mat, non.null = c('replication','meta-
 
   }
   #we take only the studies needed
+  pdf.binned.z.original = pdf.binned.z
+  binned.z.mat.original = binned.z.mat
+  
   if(sum(kept_studies)>1){
     pdf.binned.z = pdf.binned.z[which(kept_studies),,]
     binned.z.mat = binned.z.mat[,which(kept_studies)]
@@ -56,7 +59,10 @@ repfdr <- function(pdf.binned.z, binned.z.mat, non.null = c('replication','meta-
   if(non.null!='user.defined' & !is.null(non.null.rows))
     warning(sprintf("%s is selected, supplied rows are ignored.",non.null))
   
-  if(length(non.null.rows) >= dim(H)[1])
+
+  maximal_Hrows = (dim(pdf.binned.z)[3])^(nr_studies) # We cannot check against dim(H)[1], as we might have removed studies,
+  #therefore the number of rows of the final H is given by the choose expression
+  if(length(non.null.rows) >= maximal_Hrows)
     stop("Number of selected configurations is larger than possible.")
   
   #computing the local fdr, per -1/0/1 combination of the H matrix, for chunks of SNPs
@@ -71,21 +77,6 @@ repfdr <- function(pdf.binned.z, binned.z.mat, non.null = c('replication','meta-
     chunkbegin <- c(1,seq(from = chunksize,to = dim(binned.z.mat)[1],by = chunksize))
     chunkend   <- c(chunkbegin[-1]-1,dim(binned.z.mat)[1])
   }
-  
-  
-  fdr <- NULL
-  for (b in 1:length(chunkbegin)) {
-    fh <- ldr(pdf.binned.z, binned.z.mat[chunkbegin[b]:chunkend[b],,drop=FALSE],Pi = Pi, h.vecs = h0)
-    if (dim(fh)[1]==1)
-      fdr <- c(fdr,fh[,-(1:dim(H)[2])])  
-    else
-      fdr <- c(fdr,colSums(fh[,-(1:dim(H)[2]),drop=FALSE]))  
-  }
-  
-  #computing the local Fdr
-  o <- order(fdr)
-  ro <- order(o)
-  Fdr <- (cumsum(fdr[o])/(1:length(fdr)))[ro]
   
   #putting NAs in studies that were removed
   #rows which of non null H values for studies removed of probabilty NA
@@ -115,6 +106,22 @@ repfdr <- function(pdf.binned.z, binned.z.mat, non.null = c('replication','meta-
     Pi = Pi_new
     colnames(Pi) = titles
   }
+  
+  pdf.binned.z.original[is.na(pdf.binned.z.original)] = 0
+  fdr <- NULL
+  for (b in 1:length(chunkbegin)) {
+    fh <- ldr(pdf.binned.z.original, binned.z.mat.original[chunkbegin[b]:chunkend[b],,drop=FALSE],Pi = Pi, h.vecs = h0)
+    if (dim(fh)[1]==1)
+      fdr <- c(fdr,fh[,-(1:dim(H)[2])])  
+    else
+      fdr <- c(fdr,colSums(fh[,-(1:dim(H)[2]),drop=FALSE]))  
+  }
+  
+  #computing the local Fdr
+  o <- order(fdr)
+  ro <- order(o)
+  Fdr <- (cumsum(fdr[o])/(1:length(fdr)))[ro]
+  
   
   return (list(mat = cbind(fdr = fdr, Fdr = Fdr) ,Pi = Pi))
 }
@@ -206,6 +213,7 @@ ldr <- function(pdf.binned.z, binned.z.mat ,Pi, h.vecs = NULL)
         stop("Number of configurations to report is larger than possible.")
   
   fzh <- matrix(nrow = nrowH, ncol = nrowbz)
+  pbz[is.na(pbz)]=0
   for(i in 1:nrowH)
   {
     term <- vector(length = nrowbz)
@@ -215,10 +223,13 @@ ldr <- function(pdf.binned.z, binned.z.mat ,Pi, h.vecs = NULL)
     fzh[i,] <- term
   }
   
-  Pih0     <- Pi[,dim(Pi)[2]]
+  Pi.NA.to.ZERO = Pi[,dim(Pi)[2]]
+  Pi.NA.to.ZERO[is.na(Pi.NA.to.ZERO)] = 0
+  Pih0     <- Pi.NA.to.ZERO
+  Pih0[is.na(Pih0)] = 0
   Pih0[-h.vecs] <- 0
   
-  fh   <- matrix(t(t(fzh * Pih0) / as.numeric(Pi[,dim(Pi)[2]] %*% fzh ))[h.vecs,],
+  fh   <- matrix(t(t(fzh * Pih0) / as.numeric(Pi.NA.to.ZERO %*% fzh ))[h.vecs,],
                  nrow=length(h.vecs),ncol=dim(binned.z.mat)[1])
   colnames(fh) <- rownames(binned.z.mat)
   return(cbind(H[h.vecs,,drop=FALSE],fh))
@@ -260,7 +271,7 @@ inputchk <- function(pdf.binned.z, binned.z.mat){
     stop('number of studies in pdf.binned.z is different than in binned.z.mat')
   
   # pdf.binned.z value restriction (0<=p<=1):
-  if (any(pdf.binned.z<0 & pdf.binned.z>1))
+  if (any(pdf.binned.z[!is.na(pdf.binned.z)]<0 & pdf.binned.z[!is.na(pdf.binned.z)]>1))
     stop('pdf.binned.z should contain values between 0 and 1.')
   
   return(NULL)
