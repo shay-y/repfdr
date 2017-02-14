@@ -1,7 +1,7 @@
 ---
 title: "RepFDR: Package for Replicability Analysis for Multiple Studies of High Dimension"
 author: "Barak Brill, Ruth Heller"
-date: "`r Sys.Date()`"
+date: "2017 - 02 - 14"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
@@ -19,6 +19,7 @@ Model Definition comes here
 The following is an example for running a complete procedure via RepFDR
 We first simulate out data, two studies with 1e4 SNPs each. the first 2000 SNPs are non null, and sampled from N(0,4^2)
 ```{r, eval = TRUE}
+library(knitr) 
 library(repfdr)
 
 # Generate two studies,first 1000 SNPS are non null
