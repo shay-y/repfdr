@@ -81,7 +81,12 @@ repfdr <- function(pdf.binned.z, binned.z.mat, non.null = c('replication','meta-
   #putting NAs in studies that were removed
   #rows which of non null H values for studies removed of probabilty NA
   if(sum(kept_studies)!=nr_studies){
+    
     order_by = hconfigs(nr_studies,dim(pdf.binned.z)[3])
+    H = order_by
+    h0 <- switch(match.arg(non.null), replication = which(apply(order_by,1,function(y){ sum(y==1)<=1 & sum(y==-1)<=1 })),
+                 "meta-analysis" = which(rowSums(abs(order_by))==0),
+                 user.defined = (1:dim(order_by)[1])[-non.null.rows])
     cols_taken = which(kept_studies)
     cols_not_taken = which(!kept_studies)
     current_result_pointer = 1

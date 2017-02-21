@@ -63,7 +63,7 @@ See vignette('RepFDR') for a complete example, on how to run RepFDR in clusters.
 }
 \value{
   \item{mat}{An \code{Mx2} Matrix with a row for each feature (\code{M} rows) and two columns, the estimated local Bayes FDR (fdr) and the estimated Bayes FDR (Fdr).}
-  \item{Pi}{Vector of the estimated probabilities for each of the \code{x^N} possible vectors of association status. If \code{clusters} is not \code{NULL}, A matrix with number of rows being \code{choose(2+nr_studies,2)} (for \code{n.association} being 3) or \code{choose(1+nr_studies,1)} (for \code{n.association} being 3). The last column represents an aggregated probability over all combintaions for row.\}
+  \item{Pi}{Vector of the estimated probabilities for each of the \code{x^N} possible vectors of association status. If \code{clusters} is not \code{NULL}, A matrix with number of rows being \code{choose(2+nr_studies,2)} (for \code{n.association} being 3) or \code{choose(1+nr_studies,1)} (for \code{n.association} being 3). The last column represents an aggregated probability over all combintaions for row.}
 \item{repfdr.mat.percluster}{
 Returned if \code{clusters} is not \code{NULL}. A list of the \code{mat} values returned from the RepFDR analysis, per cluster.
 }
@@ -79,9 +79,11 @@ Heller, R., & Yekutieli, D. (2014). Replicability analysis for genome-wide assoc
 
 Heller, R., Yaacoby, S., & Yekutieli, D. (2014). repfdr: a tool for replicability analysis for genome-wide association studies. \emph{Bioinformatics}, btu434.
 }
+
 \author{
 Ruth Heller, Shachar Kaufman, Shay Yaacoby, Barak Brill, Daniel Yekutieli.
 }
+
 \examples{
 #### Example 1: a simulation; each feature in each study has two association states,
 ####            null and positive:

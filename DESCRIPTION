@@ -17,8 +17,8 @@ Imports: splines,Rcpp (>= 0.12.6)
 LinkingTo: Rcpp
 NeedsCompilation: yes
 Repository: CRAN
-URL: http://github.com/shay-y/repfdr
-BugReports: http://github.com/shay-y/repfdr/issues
+URL: https://github.com/barakbri/repfdr
+BugReports: https://github.com/barakbri/repfdr/issues
 Packaged: 2015-04-05 12:03:10 UTC; Shay
 Author: Ruth Heller [cre, aut],
   Shachar Kaufman [aut],
@@ -28,6 +28,5 @@ Author: Ruth Heller [cre, aut],
   Daniel Yekutieli [aut]
 Maintainer: Ruth Heller <ruheller@gmail.com>
 Date/Publication: 2015-04-06 07:51:22
-Suggests: knitr,
-    rmarkdown
+Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
