@@ -10,7 +10,7 @@ For each study, the function discretizes the z-scores into bins and estimates th
 ztobins(zmat, n.association.status = 3, n.bins = 120, type = 0,
         df = 7, central.prop = 0.5, pi0=NULL, plot.diagnostics = F,
         nr.plots.in.window=1, trim.z=F,trim.z.upper = 8,trim.z.lower = -8,
-        force.bin.number = F)
+        force.bin.number = F,null.CDF = pnorm,one.sided.setting=F,one.sided.estimation.lambda = 0.05)
 }
 \arguments{
   \item{zmat}{
@@ -55,6 +55,16 @@ Lower bound for trimming Z scores. Default value is -8
 }
 
 \item{force.bin.number}{Set to \code{T} to be able to create a discretization with \code{n.bins>sqrt(nrow(zmat))}.
+}
+
+\item{null.CDF}{
+  Input option for the CDF of the test statistics under the null. Default option is \code{pnorm} for standard normal test statistics. See example below on how to override for one sided alternative.
+  }
+\item{one.sided.setting}{
+  Logical flag indicating whether test statistics are from a right sided hypothesis (Default is \code{F}, for two sided). Estimation of proportion of null hypotheses for a one sided setting is performed using the estimator \code{(sum(Pvalues > one.sided.estimation.lambda) + 1)/(m * (1-one.sided.estimation.lambda))} where \code{m} is the number of P-values.
+}
+\item{one.sided.estimation.lambda}{
+  Parameter used for estimation of proportion of null hypotheses, for one sided tests. Default value is 0.05. This should be set to the type 1 error used for hypothesis testing.
 }
         
 }
@@ -107,5 +117,35 @@ data(zmat_sim)
 input.to.repfdr <- ztobins(zmat_sim, 2, n.bins = 100 ,plot.diagnostics = T)
 pbz_sim    <- input.to.repfdr$pdf.binned.z
 bz_sim     <- input.to.repfdr$binned.z.mat
+
+####
+#using one sided pvalues:
+####
+set.seed(1)
+p = 10000
+p1 = 300
+z1 = abs(rnorm(p))
+z2 = abs(rnorm(p))
+temp = rnorm(p1, 3.5,0.5)
+z1[1:p1] = temp + rnorm(p1,0,0.2)
+z2[1:p1] = temp + rnorm(p1,0,0.2)
+plot(z1,z2)
+hist(z1)
+hist(z2)
+
+
+null.CDF.one.sided = function(x){
+  ret = pnorm(abs(x)) - pnorm(-1*abs(x))
+  return(ret)
 }
+
+
+onesided.ztobins = ztobins(cbind(z1,z2),
+                           n.association.status = 2,
+                           plot.diagnostics = T,
+                           null.CDF = null.CDF.one.sided,
+                           one.sided.setting = T)
+
+}
+
 }

@@ -1,7 +1,7 @@
 ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df = 7,
                      central.prop = 0.5,
                      pi0=NULL,plot.diagnostics = F,nr.plots.in.window=1,
-                     trim.z=F,trim.z.upper = 8,trim.z.lower = -8, force.bin.number = F) 
+                     trim.z=F,trim.z.upper = 8,trim.z.lower = -8, force.bin.number = F,null.CDF = pnorm,one.sided.setting=F,one.sided.estimation.lambda = 0.05) 
 {
   if (type != 0 & type != 1)
     stop("type must equal 0 or 1")
@@ -27,6 +27,11 @@ ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df 
     # else pi is null, we want estimation on everything
     pi0 = rep(NA,ncol(zmat))
   }
+  
+  if(!is.logical(one.sided.setting)){
+    stop('one.sided.setting must be TRUE or FALSE ')  
+  }
+
   PlotWarnings = rep(NA,ncol(zmat))
   #convert z scores bigger than Z.MAX, or a smaller than Z.MIN
   Z.MAX = trim.z.upper
@@ -86,6 +91,9 @@ ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df 
     
     ## density's estimation
     breaks <- seq(min(zmat[,i]), max(zmat[,i]), length = n.bins)
+    if(one.sided.setting){
+      breaks <- seq(0, max(zmat[,i]), length = n.bins)
+    }
     breaks.matrix[,i] = breaks
     x <- (breaks[-1] + breaks[-length(breaks)])/2
     y <- hist(zmat[,i], breaks = breaks, plot = F)$counts
@@ -122,22 +130,35 @@ ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df 
     
     ## pi0's estimation
     if(is.na(pi0[i])){
-      lowCentral  <- quantile(zmat[,i], (1-central.prop)/2)
-      highCentral <- quantile(zmat[,i], 1-(1-central.prop)/2)
-      central <- (1:K)[x > lowCentral & x < highCentral]
-      p0theo <- sum(f[central])/sum(f0[central])
+      p0theo<- 1
+      
+      #handle the two sided z score setting
+      if(!one.sided.setting){
+        lowCentral  <- quantile(zmat[,i], (1-central.prop)/2)
+        highCentral <- quantile(zmat[,i], 1-(1-central.prop)/2)
+        central <- (1:K)[x > lowCentral & x < highCentral]
+        p0theo <- sum(f[central])/sum(f0[central])  
+      }else{
+        one.sided.pvalues = 1 - null.CDF(zmat[,i]) #we assume this function to be a real density, with zero mass everywhere
+        p0theo = (sum(one.sided.pvalues >= one.sided.estimation.lambda) + 1)/(length(one.sided.pvalues) * ( 1 - one.sided.estimation.lambda))
+      }
+      
+      
       if (p0theo>=1){
         s=paste0("In column ",i," ",colnames(zmat)[i]," the estimated fraction of nulls is 1.")
         warning(s)
         # (is identical to locfdr(zmat[,i],plot=0,nulltype=0)$fp0[1,3] )
         temp_breaks = breaks
         temp_breaks[1] = -Inf
+        if(one.sided.setting){
+          temp_breaks[1] = 0  
+        }
         temp_breaks[length(temp_breaks)] = Inf
         
         pdf.binned.z[i, , 1:(dim(pdf.binned.z)[3])] = NA
         ind_to_write = 1
         if(n.association.status == 3){ind_to_write = 2}
-        pdf.binned.z[i, , ind_to_write] = pnorm(temp_breaks[-c(1)]) - pnorm(temp_breaks[-c(length(temp_breaks))])
+        pdf.binned.z[i, , ind_to_write] = null.CDF(temp_breaks[-c(1)]) - null.CDF(temp_breaks[-c(length(temp_breaks))])
         
         proportions[,i] = c(1,rep(0,length(proportions[,i])-1))
         next #going on to next study

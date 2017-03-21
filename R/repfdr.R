@@ -25,6 +25,9 @@ repfdr <- function(pdf.binned.z, binned.z.mat, non.null = c('replication','meta-
     }
 
   }
+  if(length(which(kept_studies))==0){
+    stop("Must have at least one study with estimated fraction of nulls below 1.")
+  }
   #we take only the studies needed
   pdf.binned.z.original = pdf.binned.z
   binned.z.mat.original = binned.z.mat
@@ -108,6 +111,7 @@ repfdr <- function(pdf.binned.z, binned.z.mat, non.null = c('replication','meta-
       titles[i] = paste0('Study ',i)
     }
     titles[nr_studies + 1] = 'Pi'
+    Pi_new[is.na(Pi_new)]=0 #nas are caused by a dropped study, being non null in a row
     Pi = Pi_new
     colnames(Pi) = titles
   }
