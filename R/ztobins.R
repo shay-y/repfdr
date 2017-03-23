@@ -225,17 +225,17 @@ ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df 
         if (n.association.status != 2 & n.association.status != 3)
           stop("Invalide number of hypothesis states.")
   }
+  
   ret = list(pdf.binned.z = pdf.binned.z,
              binned.z.mat = binned.z.mat,
              breaks.matrix = breaks.matrix,
              df = df,
              proportions = proportions,
-             PlotWarnings = PlotWarnings)
+             PlotWarnings = PlotWarnings
+             )
   if(plot.diagnostics){
     plot.diagnostics()
-    
   }
-    
   return(ret)
 }
 

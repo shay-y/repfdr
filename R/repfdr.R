@@ -181,7 +181,8 @@ piem <- function(pdf.binned.z, binned.z.mat, control = em.control())
   if (EMi == control$max.iter) {
     warning('EM did not converge within tolerance after maximum number of iterations specified.', call. = FALSE)
   } else {
-    cat("Converged after",EMi,"EM iterations.")
+    if(control$verbose)
+      cat("Converged after",EMi,"EM iterations.")
   }
   return(list(all.iterations=cbind(H,out),
               last.iteration=cbind(H,Pi=out[,dim(out)[2]])))
