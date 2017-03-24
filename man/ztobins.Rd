@@ -10,7 +10,7 @@ For each study, the function discretizes the z-scores into bins and estimates th
 ztobins(zmat, n.association.status = 3, n.bins = 120, type = 0,
         df = 7, central.prop = 0.5, pi0=NULL, plot.diagnostics = F,
         nr.plots.in.window=1, trim.z=F,trim.z.upper = 8,trim.z.lower = -8,
-        force.bin.number = F,null.CDF = pnorm,one.sided.setting=F,one.sided.estimation.lambda = 0.05)
+        force.bin.number = F,null.CDF = pnorm,one.sided.setting=F,one.sided.estimation.lambda = 0.05, plot.H = F)
 }
 \arguments{
   \item{zmat}{
@@ -65,6 +65,10 @@ Lower bound for trimming Z scores. Default value is -8
 }
 \item{one.sided.estimation.lambda}{
   Parameter used for estimation of proportion of null hypotheses, for one sided tests. Default value is 0.05. This should be set to the type 1 error used for hypothesis testing.
+}
+
+\item{plot.H}{
+  Sets whether diagnostic plots shoudl be displayed horizontaly (Default is False) 
 }
         
 }

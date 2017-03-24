@@ -1,7 +1,7 @@
 ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df = 7,
                      central.prop = 0.5,
                      pi0=NULL,plot.diagnostics = F,nr.plots.in.window=1,
-                     trim.z=F,trim.z.upper = 8,trim.z.lower = -8, force.bin.number = F,null.CDF = pnorm,one.sided.setting=F,one.sided.estimation.lambda = 0.05) 
+                     trim.z=F,trim.z.upper = 8,trim.z.lower = -8, force.bin.number = F,null.CDF = pnorm,one.sided.setting=F,one.sided.estimation.lambda = 0.05,plot.H = F) 
 {
   if (type != 0 & type != 1)
     stop("type must equal 0 or 1")
@@ -242,6 +242,7 @@ ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df 
 #env = parent.frame()
 #ztobins.res, nr.plots.in.window = 1
 plot.diagnostics=function(env = parent.frame()){
+  plot.H = env$plot.H
   ztobins.res = env$ret
   nr.plots.in.window = env$nr.plots.in.window
   breaks.mat = ztobins.res$breaks.matrix
@@ -250,7 +251,11 @@ plot.diagnostics=function(env = parent.frame()){
   pdf.binned.z[ind_to_zero] = 0
   binned.z.mat.to.plot = ztobins.res$binned.z.mat
   proportions = ztobins.res$proportions
-  par(mfrow=c(nr.plots.in.window,1))
+  if(!plot.H){
+    par(mfrow=c(nr.plots.in.window,1))  
+  }else{
+    par(mfrow=c(1,nr.plots.in.window))
+  }
   for(i in 1:ncol(binned.z.mat.to.plot)){
     current_breaks = 0.5*(breaks.mat[-c(1),i] + breaks.mat[-c(nrow(breaks.mat)),i])
     lengths = (breaks.mat[-c(1),i] - breaks.mat[-c(nrow(breaks.mat)),i])
