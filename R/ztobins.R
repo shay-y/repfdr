@@ -18,7 +18,7 @@ ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df 
       }
       
       if(is.numeric(pi0[i])){
-        if(pi0[i]<= 0 | pi0[i] >=1){
+        if(pi0[i]<= 0 | pi0[i] >1){
           stop('pi0 must be between 0 and 1. use the default value (NULL) for estimation.')  
         }  
       }
@@ -85,8 +85,10 @@ ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df 
   
   breaks.matrix = matrix(NA,nrow = n.bins,ncol = ncol(zmat))
   proportions = matrix(NA,nrow = n.association.status,ncol = ncol(zmat))
+  skip_study = F
   for (i in 1:n.studies)
     {
+    skip_study = F
     ### parts of the code here are adopted from locfdr function (package locfdr by Bradley Efron)
     
     ## density's estimation
@@ -145,28 +147,34 @@ ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df 
       
       
       if (p0theo>=1){
-        s=paste0("In column ",i," ",colnames(zmat)[i]," the estimated fraction of nulls is 1.")
-        warning(s)
-        # (is identical to locfdr(zmat[,i],plot=0,nulltype=0)$fp0[1,3] )
-        temp_breaks = breaks
-        temp_breaks[1] = -Inf
-        if(one.sided.setting){
-          temp_breaks[1] = 0  
-        }
-        temp_breaks[length(temp_breaks)] = Inf
-        
-        pdf.binned.z[i, , 1:(dim(pdf.binned.z)[3])] = NA
-        ind_to_write = 1
-        if(n.association.status == 3){ind_to_write = 2}
-        pdf.binned.z[i, , ind_to_write] = null.CDF(temp_breaks[-c(1)]) - null.CDF(temp_breaks[-c(length(temp_breaks))])
-        
-        proportions[,i] = c(1,rep(0,length(proportions[,i])-1))
-        next #going on to next study
+        skip_study = T
       }
     }else{
       p0theo = pi0[i]
+      if(p0theo>1){
+        skip_study = T
+      }
     }
     
+    if(skip_study){
+      s=paste0("In column ",i," ",colnames(zmat)[i]," the estimated fraction of nulls is 1.")
+      warning(s)
+      # (is identical to locfdr(zmat[,i],plot=0,nulltype=0)$fp0[1,3] )
+      temp_breaks = breaks
+      temp_breaks[1] = -Inf
+      if(one.sided.setting){
+        temp_breaks[1] = 0  
+      }
+      temp_breaks[length(temp_breaks)] = Inf
+      
+      pdf.binned.z[i, , 1:(dim(pdf.binned.z)[3])] = NA
+      ind_to_write = 1
+      if(n.association.status == 3){ind_to_write = 2}
+      pdf.binned.z[i, , ind_to_write] = null.CDF(temp_breaks[-c(1)]) - null.CDF(temp_breaks[-c(length(temp_breaks))])
+      
+      proportions[,i] = c(1,rep(0,length(proportions[,i])-1))
+      next #going on to next study
+    }
     
     
     ## fdr's first estimation
