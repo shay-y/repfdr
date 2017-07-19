@@ -3,7 +3,7 @@ repfdr <- function(pdf.binned.z, binned.z.mat, non.null = c('replication','meta-
 {
   #we handle the case of clusterd results in a seperate function
   if(!is.null(clusters)){
-    return(repfdr:::repfdr_clusters(pdf.binned.z = pdf.binned.z,
+    return(repfdr_clusters(pdf.binned.z = pdf.binned.z,
                                     binned.z.mat = binned.z.mat,
                                     clusters = clusters,
                                     non.null = non.null,

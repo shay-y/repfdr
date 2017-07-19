@@ -127,7 +127,7 @@ repfdr_clusters <- function(pdf.binned.z, binned.z.mat,clusters, non.null = c('r
     
     #performing the per SNP aggregation of lfdr
     i_is_last = (i==dim(binned.z.mat)[1]) #PI is computed only for the last i
-    Rcpp_res = repfdr:::rcpp_main(Sizes = c(nr_studies,n_bins,n_association_status,
+    Rcpp_res = rcpp_main(Sizes = c(nr_studies,n_bins,n_association_status,
                                             nr_clusters,non.null.trans,non.null.u,current_SNP,0,1*i_is_last), #0 is for the debug value
                                   pdf.binned.z.list.index0,
                                   pdf.binned.z.list.index1,

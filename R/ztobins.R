@@ -1,8 +1,60 @@
-ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df = 7,
+ztobins <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df = 7,
+                    central.prop = 0.5,
+                    pi0=NULL,plot.diagnostics = F,
+                    trim.z=F,trim.z.upper = 8,trim.z.lower = -8, force.bin.number = F,
+                    pi.using.plugin = F, pi.plugin.lambda = 0.05){
+  
+  null.CDF.two.sided.pvalues = function(x){
+    ret = pnorm(abs(x)) - pnorm(-1*abs(x))
+    return(ret)
+  }
+  
+  return(
+    backend.ztobins(zmat,n.association.status,n.bins,type,df,
+            central.prop,pi0,plot.diagnostics,
+            trim.z,trim.z.upper,trim.z.lower,force.bin.number,
+            null.CDF = null.CDF.two.sided.pvalues, one.sided.plot=F,
+            pi.using.plugin, pi.plugin.lambda)
+  )  
+}
+
+twosided.PValues.tobins <- function(pval.mat, n.bins = 120, type = 0, df = 7,
+                                   central.prop = 0.5,
+                                   pi0=NULL,plot.diagnostics = F,
+                                   trim.z=F,trim.z.upper = 8,trim.z.lower = -8, force.bin.number = F,
+                                   pi.plugin.lambda = 0.05){
+  
+  zmat = qnorm(1- 0.5 * pval.mat)
+  
+  null.CDF.two.sided.pvalues = function(x){
+    ret = pnorm(abs(x)) - pnorm(-1*abs(x))
+    return(ret)
+  }
+  
+  return(
+    backend.ztobins(zmat, n.association.status = 2, n.bins, type, df,
+                    central.prop,
+                    pi0,plot.diagnostics,
+                    trim.z,trim.z.upper,trim.z.lower, force.bin.number,
+                    null.CDF = null.CDF.two.sided.pvalues, one.sided.plot=T,
+                    pi.using.plugin = T, pi.plugin.lambda)
+  )
+
+}
+
+backend.ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df = 7,
                      central.prop = 0.5,
-                     pi0=NULL,plot.diagnostics = F,nr.plots.in.window=1,
-                     trim.z=F,trim.z.upper = 8,trim.z.lower = -8, force.bin.number = F,null.CDF = pnorm,one.sided.setting=F,one.sided.estimation.lambda = 0.05,plot.H = F) 
+                     pi0=NULL,plot.diagnostics = F,
+                     trim.z=F,trim.z.upper = 8,trim.z.lower = -8, force.bin.number = F,
+                     null.CDF = NULL, one.sided.plot=F,
+                     pi.using.plugin = F, pi.plugin.lambda = 0.05) 
 {
+  if(is.null(null.CDF)){
+    null.CDF = function(x){
+      ret = pnorm(abs(x)) - pnorm(-1*abs(x))
+      return(ret)
+    }
+  }
   if (type != 0 & type != 1)
     stop("type must equal 0 or 1")
   if (central.prop <= 0 | central.prop >= 1)
@@ -28,8 +80,11 @@ ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df 
     pi0 = rep(NA,ncol(zmat))
   }
   
-  if(!is.logical(one.sided.setting)){
-    stop('one.sided.setting must be TRUE or FALSE ')  
+  if(!is.logical(one.sided.plot)){
+    stop('one.sided.plot must be TRUE or FALSE ')  
+  }
+  if(!is.logical(pi.using.plugin)){
+    stop('pi.using.plugin must be TRUE or FALSE ')  
   }
 
   PlotWarnings = rep(NA,ncol(zmat))
@@ -93,7 +148,7 @@ ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df 
     
     ## density's estimation
     breaks <- seq(min(zmat[,i]), max(zmat[,i]), length = n.bins)
-    if(one.sided.setting){
+    if(one.sided.plot){
       breaks <- seq(0, max(zmat[,i]), length = n.bins)
     }
     breaks.matrix[,i] = breaks
@@ -135,17 +190,16 @@ ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df 
       p0theo<- 1
       
       #handle the two sided z score setting
-      if(!one.sided.setting){
+      if(!pi.using.plugin){
         lowCentral  <- quantile(zmat[,i], (1-central.prop)/2)
         highCentral <- quantile(zmat[,i], 1-(1-central.prop)/2)
         central <- (1:K)[x > lowCentral & x < highCentral]
         p0theo <- sum(f[central])/sum(f0[central])  
       }else{
-        one.sided.pvalues = 1 - null.CDF(zmat[,i]) #we assume this function to be a real density, with zero mass everywhere
-        p0theo = (sum(one.sided.pvalues >= one.sided.estimation.lambda) + 1)/(length(one.sided.pvalues) * ( 1 - one.sided.estimation.lambda))
+        two.sided.pvalues = 1 - null.CDF(zmat[,i]) #we assume this function to be a real density, with zero mass everywhere
+        p0theo = (sum(two.sided.pvalues >= pi.plugin.lambda) + 1)/(length(two.sided.pvalues) * ( 1 - pi.plugin.lambda
+))
       }
-      
-      
       if (p0theo>=1){
         skip_study = T
       }
@@ -162,7 +216,7 @@ ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df 
       # (is identical to locfdr(zmat[,i],plot=0,nulltype=0)$fp0[1,3] )
       temp_breaks = breaks
       temp_breaks[1] = -Inf
-      if(one.sided.setting){
+      if(one.sided.plot){
         temp_breaks[1] = 0  
       }
       temp_breaks[length(temp_breaks)] = Inf
@@ -239,31 +293,30 @@ ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df 
              breaks.matrix = breaks.matrix,
              df = df,
              proportions = proportions,
-             PlotWarnings = PlotWarnings
+             PlotWarnings = PlotWarnings,
+             trim.z.lower = trim.z.lower,
+             trim.z.upper = trim.z.upper
              )
   if(plot.diagnostics){
-    plot.diagnostics()
+    diagnostics.plot()
   }
   return(ret)
 }
 
-#env = parent.frame()
-#ztobins.res, nr.plots.in.window = 1
-plot.diagnostics=function(env = parent.frame()){
-  plot.H = env$plot.H
+
+diagnostics.plot=function(env = parent.frame()){
   ztobins.res = env$ret
-  nr.plots.in.window = env$nr.plots.in.window
+  theo.CDF = env$null.CDF
   breaks.mat = ztobins.res$breaks.matrix
   pdf.binned.z = ztobins.res$pdf.binned.z
   ind_to_zero = which(is.nan(pdf.binned.z))
   pdf.binned.z[ind_to_zero] = 0
   binned.z.mat.to.plot = ztobins.res$binned.z.mat
   proportions = ztobins.res$proportions
-  if(!plot.H){
-    par(mfrow=c(nr.plots.in.window,1))  
-  }else{
-    par(mfrow=c(1,nr.plots.in.window))
-  }
+  trim.z.lower = ztobins.res$trim.z.lower
+  trim.z.upper = ztobins.res$trim.z.upper
+  
+  par(mfrow=c(1,1))
   for(i in 1:ncol(binned.z.mat.to.plot)){
     current_breaks = 0.5*(breaks.mat[-c(1),i] + breaks.mat[-c(nrow(breaks.mat)),i])
     lengths = (breaks.mat[-c(1),i] - breaks.mat[-c(nrow(breaks.mat)),i])
@@ -284,9 +337,15 @@ plot.diagnostics=function(env = parent.frame()){
     #plot spline for total distribution
     line_w = 3
     max_y = 1.1* max(max(plot_y),max(counts_data))
-    
+    plot_max = 1.1 * max(current_breaks)
+    plot_min = 1.1 * min(current_breaks)
+    if(min(current_breaks)>0){
+      plot_min = 0
+    }
+    if(plot_min< trim.z.lower){plot_min = trim.z.lower}
+    if(plot_max> trim.z.upper){plot_max = trim.z.upper}
     plot(current_breaks,plot_y, main = paste0('RepFdr Diagnostics, Study ',i,', df=',ztobins.res$df),
-         xlab = 'Z. Scores',ylab='Counts',lty=1,ylim = c(0,max_y),type='l',col = 'green',lwd = 3)
+         xlab = 'Z. Scores',ylab='Counts',lty=1,ylim = c(0,max_y),type='l',col = 'green',lwd = 3,xlim = c(plot_min,plot_max))
     
     #sticks for real data and residuals (pink)
     ind_of_null = 1
@@ -315,10 +374,33 @@ plot.diagnostics=function(env = parent.frame()){
     }
     w=ztobins.res$PlotWarnings[i]
     if(!is.na(w)){
-      text(current_breaks[floor(length(current_breaks)/4)],0.8*max(plot_y),
-           wrap.it(w,30),col='red')
+      
+      #text(current_breaks[floor(length(current_breaks)/4)],0.8*max(plot_y),
+           #wrap.it(w,30),col='red')
+      text(mean(par("xaxp")[1:2]),0.8*max(par("yaxp")[1:2]),
+      wrap.it(w,20),col='red')
     }
-  }
+    
+    #plot qqnorm plot
+    x = env$zmat[,i]
+    if(env$one.sided.plot) #for turning 2-sided pvalues in Z scores on a monotone scale
+      x = qnorm(theo.CDF(x))
+    #x_theory = qnorm((rank(x)-0.5)/length(x))  
+    plot_max = 1.1 * max(x)
+    plot_min = 1.1 * min(x)
+    if(min(x)>0){
+      plot_min = 0
+    }
+    if(plot_min< trim.z.lower){plot_min = trim.z.lower}
+    if(plot_max> trim.z.upper){plot_max = trim.z.upper}
+    qqnorm(sort(x),type='l',lwd = 2,main = paste0('Q-Q plot, Study ',i),xlim = c(-2.1,2.1) , ylim = c(plot_min,plot_max))
+    qqline(x,col='red')
+    abline(0,1,col = 'black',lty=2,lwd=2)
+    points(0,0,pch=20,cex=2,col='black')
+    #x_p = (rank(x) - 0.5)/length(x)
+    #plot(sort(x_p),sort(pnorm(x)),xlab = 'Theoretical Uniform Quantiles',ylab = "Sample Quantiles",main = paste0('P-P plot, Study ',i),xlim = c(0,1),ylim = c(0,1),type='l',lwd = 1)
+    #abline(a=0,b = 1,col='red',lty=2)
+  }#end of for loop over studues
   par(mfrow=c(1,1))
 }
 
