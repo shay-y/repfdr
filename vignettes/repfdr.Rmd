@@ -355,7 +355,7 @@ head(res$Pi)
 #knitr::include_graphics("h_clusters.jpg")
 #save(plot_ldr,file = '/home/barak/repfdr_Project/repfdr/vignettes/plot_ldr.Rdata')
 load('plot_ldr.Rdata')
-knitr::kable(plot_ldr,format = "latex")
+knitr::kable(plot_ldr,format = "latex",digits = 9)
 
 ```
 

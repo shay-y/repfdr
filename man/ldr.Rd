@@ -38,7 +38,10 @@ Matrix with rows that contain for each of the vectors of association status  the
 \examples{
 
 \dontrun{
-data(binned_zmat)
+download.file('http://www.math.tau.ac.il/~ruheller/repfdr_RData/binned_zmat.RData',
+  destfile = "binned_zmat.RData")
+load(file = "binned_zmat.RData")
+  
 data(Pi)
 
 # Fdr calculation:

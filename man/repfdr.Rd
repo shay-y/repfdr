@@ -125,7 +125,10 @@ sum(Rej * !true.assoc) / sum(true.assoc)
 ####            negative, null, or positive: 
 
 # load the bins of the z-scores and their probabilities.
-data(binned_zmat)
+download.file('http://www.math.tau.ac.il/~ruheller/repfdr_RData/binned_zmat.RData',
+  destfile = "binned_zmat.RData")
+load(file = "binned_zmat.RData")
+# can also be generated from SNPlocation - see ztobins documentation.
 
 # load the prior probabilities for each association status vector.
 data(Pi)
@@ -164,11 +167,11 @@ sum(Rej)
   # Replication 
   manhattan(dataframe=cbind(SNPlocations,P=BayesFdr.rep),ymax=10.5,pch=20,
             limitchromosomes=1:4,suggestiveline=-log(0.05,10),genomewideline=F,cex=0.25,
-            annotate=SNPlocations$SNP[BayesFdr<=0.05],main="Replication")
+            annotate=SNPlocations$SNP[BayesFdr.rep<=0.05],main="Replication")
   # Association
   manhattan(dataframe=cbind(SNPlocations,P=BayesFdr.meta),ymax=10.5,cex=0.25,
             limitchromosomes=1:4,suggestiveline=-log(0.05,10),genomewideline=F,pch=20,
-            annotate=SNPlocations$SNP[BayesFdr<=0.05],main="Meta-analysis")
+            annotate=SNPlocations$SNP[BayesFdr.rep<=0.05],main="Meta-analysis")
   par(mfrow=c(1,1))
 }
 }

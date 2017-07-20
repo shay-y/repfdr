@@ -38,7 +38,9 @@ A list with the input values.
 }
 \examples{
 \dontrun{
-data(binned_zmat)
+download.file('http://www.math.tau.ac.il/~ruheller/repfdr_RData/binned_zmat.RData',
+  destfile = "binned_zmat.RData")
+load(file = "binned_zmat.RData")
 out <- repfdr(pbz,bz,"replication",
               control = em.control(pi.initial = c(0.48,rep(0.02,26)),
               verbose = TRUE, nr.threads = 1))

@@ -41,7 +41,11 @@ Heller, Ruth, and Daniel Yekutieli. "Replicability analysis for Genome-wide Asso
 }
 \examples{
 \dontrun{
-data(binned_zmat)
+
+download.file('http://www.math.tau.ac.il/~ruheller/repfdr_RData/binned_zmat.RData',
+  destfile = "binned_zmat.RData")
+load(file = "binned_zmat.RData")
+#binned_zmat can also be generated via 
 output_piem <- piem(pbz, bz)
 
 # extract the last iteration to use it in repfdr (see help(repfdr)):
