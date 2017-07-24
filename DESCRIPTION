@@ -19,7 +19,7 @@ NeedsCompilation: yes
 Repository: CRAN
 URL: https://github.com/barakbri/repfdr
 BugReports: https://github.com/barakbri/repfdr/issues
-Packaged: 2017-07-19 11:10:33 UTC; barak
+Packaged: 2017-07-20 16:40:18 UTC; Barak
 Author: Ruth Heller [cre, aut],
   Shachar Kaufman [aut],
   Shay Yaacoby [aut],
@@ -28,5 +28,7 @@ Author: Ruth Heller [cre, aut],
   Daniel Yekutieli [aut]
 Maintainer: Ruth Heller <ruheller@gmail.com>
 Date/Publication: 2015-04-06 07:51:22
-Suggests: knitr, rmarkdown
-VignetteBuilder: knitr
+Suggests: R.rsp
+VignetteBuilder: R.rsp
+LinkingTo: 
+    Rcpp

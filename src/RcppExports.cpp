@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // rcpp_main
 List rcpp_main(NumericVector Sizes, List pdf_binned_z_list_index0, List pdf_binned_z_list_index1, List pdf_binned_z_list_index2, List binned_z_mat_list, List cluster_ind_list, List repfdr_Pi_list);
-RcppExport SEXP repfdr_rcpp_main(SEXP SizesSEXP, SEXP pdf_binned_z_list_index0SEXP, SEXP pdf_binned_z_list_index1SEXP, SEXP pdf_binned_z_list_index2SEXP, SEXP binned_z_mat_listSEXP, SEXP cluster_ind_listSEXP, SEXP repfdr_Pi_listSEXP) {
+RcppExport SEXP _repfdr_rcpp_main(SEXP SizesSEXP, SEXP pdf_binned_z_list_index0SEXP, SEXP pdf_binned_z_list_index1SEXP, SEXP pdf_binned_z_list_index2SEXP, SEXP binned_z_mat_listSEXP, SEXP cluster_ind_listSEXP, SEXP repfdr_Pi_listSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;

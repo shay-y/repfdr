@@ -2,6 +2,6 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 rcpp_main <- function(Sizes, pdf_binned_z_list_index0, pdf_binned_z_list_index1, pdf_binned_z_list_index2, binned_z_mat_list, cluster_ind_list, repfdr_Pi_list) {
-    .Call('repfdr_rcpp_main', PACKAGE = 'repfdr', Sizes, pdf_binned_z_list_index0, pdf_binned_z_list_index1, pdf_binned_z_list_index2, binned_z_mat_list, cluster_ind_list, repfdr_Pi_list)
+    .Call(`_repfdr_rcpp_main`, Sizes, pdf_binned_z_list_index0, pdf_binned_z_list_index1, pdf_binned_z_list_index2, binned_z_mat_list, cluster_ind_list, repfdr_Pi_list)
 }
 

@@ -2,6 +2,9 @@
 #include <Rinternals.h>
 #include <math.h>
 #include <pthread.h>
+#include <R_ext/Rdynload.h>
+#include <R_ext/Visibility.h>
+#include <Rversion.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -11,6 +14,8 @@
 
 // due to an extremely annoying bug, I am not using joinable threads
 #define JOIN_THREADS_MANUALLY
+
+
 
 // BUILD NOTE:
 // On Windows, need to compile with R CMD SHLIB REM.c -pthread

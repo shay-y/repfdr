@@ -3,7 +3,7 @@ output: pdf_document
 ---
 ---
 title: "repfdr: Package for Replicability Analysis for Multiple Studies of High Dimension"
-author: "Barak Brill, Ruth Heller, Shay Yaacobi, Daniel Yekutieli"
+author: "Barak Brill, Ruth Heller, Shay Yaacoby, Daniel Yekutieli"
 date: "2017 - 07 - 17"
 output: pdf_document
 toc: TRUE

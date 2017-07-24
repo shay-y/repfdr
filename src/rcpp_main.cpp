@@ -2,69 +2,74 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-
 //function to convert 3 counters to key
-long long N3_to_long(int N, int N_0, int N_1, int N_2){
-  return(N_0 + (N+1)*N_1 + (N+1)*(N+1)*N_2);
+std::vector<int> N3_to_vec(int N, int N_0, int N_1, int N_2){
+  int keys[] = {N_0,N_1,N_2};
+  std::vector<int> res (keys, keys + sizeof(keys) / sizeof(int) );
+  return(res);
   //return(std::string(N_0) + "/" + std::string(N_1) + "/" +  std::string(N_2) + "/" +std::string(N_3));
 }
 
 
 
 //function to convert key to 3 counters
-void long_to_N3(int N,long long l, int &N_0,int &N_1,int &N_2){
-  long long temp=l;
-  N_0 = temp%(N+1);
-  temp = (temp - N_0)/(N+1);
-  N_1 = temp%(N+1); 
-  temp = (temp - N_1)/(N+1);
-  N_2 = temp%(N+1);
+void vec_to_N3(int N,std::vector<int> key, int &N_0,int &N_1,int &N_2){
+  
+  N_0 = key.at(0);
+  N_1 = key.at(1); 
+  N_2 = key.at(2);
 }
 
 //function for computing outer product of two hash tables
-std::map <long long,double> hashtable_outer_product(std::map <long long,double> d_l,
-                                                    std::map <long long,double> d_r,
+std::map <std::vector<int>,double> hashtable_outer_product(std::map <std::vector<int>,double> d_l,
+                                                    std::map <std::vector<int>,double> d_r,
                                                     int N){
   
   //these will be used for iterating over the keys and values of the two hash tables
   int cur_N0_l,cur_N1_l,cur_N2_l;
   int cur_N0_r,cur_N1_r,cur_N2_r;
-  std::map<long long, double> next_dist;
+  std::map<std::vector<int>, double> next_dist;
   double cur_prob_l=1.0;
   double cur_prob_r=1.0;
   double temp_prob=1.0;
   
-  long long cur_key_l=0L;
-  long long cur_key_r=0L;
-  long long temp_key=0L;
+  std::vector<int> cur_key_l;
+  std::vector<int> cur_key_r;
+  std::vector<int> temp_key;
   
-  std::map<long long,double>::iterator iter_l;
-  std::map<long long ,double>::iterator iter_r;
+  std::map<std::vector<int>,double>::iterator iter_l;
+  std::map<std::vector<int> ,double>::iterator iter_r;
   //iterate over items of the left distribution
+  //double _thres = (10^(-10));
   for(iter_l = d_l.begin(); iter_l != d_l.end(); iter_l++)
   {
     cur_key_l =  (iter_l->first);
     cur_prob_l = (iter_l->second);
-    long_to_N3(N,cur_key_l,cur_N0_l,cur_N1_l,cur_N2_l);
+    vec_to_N3(N,cur_key_l,cur_N0_l,cur_N1_l,cur_N2_l);
     
     //iterate over items of the right distribution
     for(iter_r = d_r.begin(); iter_r != d_r.end(); iter_r++){
       cur_key_r =  (iter_r->first);
       cur_prob_r = (iter_r->second);
-      long_to_N3(N,cur_key_r,cur_N0_r,cur_N1_r,cur_N2_r);
+      vec_to_N3(N,cur_key_r,cur_N0_r,cur_N1_r,cur_N2_r);
       
       //this is the item to add
       temp_prob = cur_prob_l * cur_prob_r;
-      temp_key =  N3_to_long(N,
+      temp_key =  N3_to_vec(N,
                              cur_N0_l + cur_N0_r,
                              cur_N1_l + cur_N1_r,
                              cur_N2_l + cur_N2_r);
       //we add the item to the next distribution
-      if( next_dist.count(temp_key)>0 ){
-        next_dist[temp_key] = next_dist[temp_key] + temp_prob;
-      }else{
-        next_dist[temp_key] = temp_prob;
-      }
+      
+      // for large groups I need to check if(temp_prob > _thres) // this is used for filtering out cases which are rare
+      
+        if( next_dist.count(temp_key)>0 ){
+          next_dist[temp_key] = next_dist[temp_key] + temp_prob;
+        }else{
+          next_dist[temp_key] = temp_prob;
+        }  
+      
+      
     }//end of iterate over right
   } // end of iterate over left
   return(next_dist);
@@ -72,8 +77,8 @@ std::map <long long,double> hashtable_outer_product(std::map <long long,double> 
 
 //this is the object returned by Cluster_to_HashTable
 struct Cluster_to_HashTable_Return{
-  std::map <long long,double> dist;
-  std::map <long long,double> dist_PI;
+  std::map <std::vector<int>,double> dist;
+  std::map <std::vector<int>,double> dist_PI;
 } ;
 
 //function for converting cluster data to hashtable
@@ -90,8 +95,8 @@ Cluster_to_HashTable_Return Cluster_to_HashTable(
     bool compute_PI
     ){
   
-  std::map<long long, double> next_dist; // this if for the Local FDR
-  std::map<long long, double> next_dist_PI; // this is for the PI matrix
+  std::map<std::vector<int>, double> next_dist; // this if for the Local FDR
+  std::map<std::vector<int>, double> next_dist_PI; // this is for the PI matrix
   
   int current_0 = 0;
   int current_1 = 0;
@@ -103,7 +108,7 @@ Cluster_to_HashTable_Return Cluster_to_HashTable(
   int nr_studies_in_cluster = incluster_studies_ind.length();
   int Pi_col = incluster_Pi.ncol()-1; // this column holds the probability of the PI mat
   
-  long long current_key;
+  std::vector<int> current_key;
   
   //we first find on what bin is the SNP in each study for this cluster
   NumericVector bin_for_snp_in_study(nr_studies_in_cluster);
@@ -141,7 +146,7 @@ Cluster_to_HashTable_Return Cluster_to_HashTable(
     //we now have finished computing a row.
     //we add it to the null table.
     //we need to check if it is found or not
-    current_key = N3_to_long(nr_studies,current_0,current_1,current_2);
+    current_key = N3_to_vec(nr_studies,current_0,current_1,current_2);
     
     if( next_dist.count(current_key)>0 ){
       next_dist[current_key] = next_dist[current_key] + current_prob;
@@ -160,7 +165,6 @@ Cluster_to_HashTable_Return Cluster_to_HashTable(
   ret.dist_PI = next_dist_PI;
   return(ret);
 } // done Cluster_to_HashTable
-
 
 
 // [[Rcpp::export]]
@@ -191,11 +195,11 @@ List rcpp_main(NumericVector Sizes,
     }
     
     //generate base table
-    std::map<long long, double> dist; // the base distribution has no values measured , and has prob 1
-    dist[N3_to_long(nr_studies,0,0,0)] = 1.0;
+    std::map<std::vector<int>, double> dist; // the base distribution has no values measured , and has prob 1
+    dist[N3_to_vec(nr_studies,0,0,0)] = 1.0;
     
-    std::map<long long, double> dist_PI; //This holds PI
-    dist_PI[N3_to_long(nr_studies,0,0,0)] = 1.0;
+    std::map<std::vector<int>, double> dist_PI; //This holds PI
+    dist_PI[N3_to_vec(nr_studies,0,0,0)] = 1.0;
     
     //These will be used to extract the per cluster information
     NumericMatrix incluster_pdf_index_0 ;
@@ -233,16 +237,16 @@ List rcpp_main(NumericVector Sizes,
         (Compute_PI >0.5)
       );
       
-      std::map<long long, double> current_cluster = current_cluster_ret.dist;
-      std::map<long long, double> current_cluster_PI = current_cluster_ret.dist_PI;
+      std::map<std::vector<int>, double> current_cluster = current_cluster_ret.dist;
+      std::map<std::vector<int>, double> current_cluster_PI = current_cluster_ret.dist_PI;
       
       // DEBUG we also look at the per iteration table added to the current distribution
       if(false && debug>0){
         REprintf("Printing table to add \n\r");
-        std::map<long long,double>::iterator current_cluster_iter;
+        std::map<std::vector<int>,double>::iterator current_cluster_iter;
         for(current_cluster_iter = current_cluster.begin(); current_cluster_iter != current_cluster.end(); current_cluster_iter++)
         {
-          long_to_N3(nr_studies,current_cluster_iter->first, N0, N1, N2);
+          vec_to_N3(nr_studies,current_cluster_iter->first, N0, N1, N2);
           REprintf("N0:%d N1:%d N2:%d P:%f \n\r",N0,N1,N2,(current_cluster_iter->second));
         }
         
@@ -263,18 +267,19 @@ List rcpp_main(NumericVector Sizes,
     //Extract results
     //***************************
     
-    Rcpp::NumericVector keys(dist.size());//extract keys and values
+    //Rcpp::NumericVector keys(dist.size());
+    //extract keys and values
     Rcpp::NumericVector values(dist.size());
     Rcpp::NumericVector values_PI(dist.size());
     Rcpp::NumericMatrix keys_counts_arr(dist.size(), 3);
     //REprintf('%ld',result.size());
     long pointer=0;
-    std::map<long long,double>::iterator iter;
+    std::map<std::vector<int>,double>::iterator iter;
     for(iter = dist.begin(); iter != dist.end(); iter++)
     {
       
-      keys[pointer]=double(iter->first);
-      long_to_N3(nr_studies,iter->first, N0, N1, N2);
+      //keys[pointer]=double(iter->first); // old implementation form the time the keys where long long and not std::vector<int>
+      vec_to_N3(nr_studies,iter->first, N0, N1, N2);
       keys_counts_arr(pointer,0) = double(N0);
       keys_counts_arr(pointer,1) = double(N1);
       keys_counts_arr(pointer,2) = double(N2);
