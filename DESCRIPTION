@@ -1,9 +1,10 @@
 Package: repfdr
 Type: Package
 Title: Replicability Analysis for Multiple Studies of High Dimension
-Version: 1.2
+Version: 1.2.2
 Description: Estimation of Bayes and local Bayes false discovery rates for
-    replicability analysis.
+      replicability analysis (Heller & Yekutieli, 2014 <doi:10.1214/13-AOAS697> ;
+      Heller at al., 2015 <doi: 10.1093/bioinformatics/btu434>).
 Authors@R: c(
     person("Ruth", "Heller", email = "ruheller@gmail.com", role = c("cre","aut")),
     person("Shachar", "Kaufman", role = "aut"),

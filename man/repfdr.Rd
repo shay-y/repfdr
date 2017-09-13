@@ -87,7 +87,7 @@ Ruth Heller, Shachar Kaufman, Shay Yaacoby, Barak Brill, Daniel Yekutieli.
 \examples{
 #### Example 1: a simulation; each feature in each study has two association states,
 ####            null and positive:
-
+\dontrun{
 # a) Replicablity analysis:
 data(binned_zmat_sim) # this loads the binned z-scores as well as the (estimated) probabilities
 # in each bin for each state 
@@ -119,6 +119,8 @@ true.assoc <- rowSums(hmat_sim) >= 1
 
 # Compute the false discovery proportion (FDP) for association:
 sum(Rej * !true.assoc) / sum(true.assoc) 
+
+}
 
 \dontrun{
 #### Example 2: SNPs data; each SNP in each study has three association states,

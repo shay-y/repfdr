@@ -117,7 +117,7 @@ A second plot for each study  is a Q-Q plot of the observed quantiles versus the
 
 If the null distribution is not standard normal, data has to be transformed in a way which make the test statistics standard normal under the null prior to input into `ztobins`. The section for model misspecification shows an example of model misfit, that could be identified by the user with these diagnostic plots.
 
-```{r,eval = TRUE, fig.width=6, fig.height=4, fig.align='center',echo=T}
+```{r,eval = TRUE, fig.width=8, fig.height=5, fig.align='center',echo=T}
 # perform discretization, visualize results
 res = ztobins(zmat = my_zmat, plot.diagnostics = T,df = 20,n.bins = 50,trim.z = F)
 
@@ -160,7 +160,7 @@ length(which(repfdr.res$mat[,2] <= 0.05))
 #Example using two sided P-Values as input#
 We now show how two sided P-Values can be used for input into `repfdr` via the `twosided.PValues.tobins` function. This function should be used only for non-directional inference (e.g., identifying that at least two studies contain signal, regardless of the association direction).
 
-```{r,eval = TRUE, fig.width=6,fig.height=4, fig.align='center'}
+```{r,eval = TRUE, fig.width=8,fig.height=5, fig.align='center'}
 
 ####
 #DATA GENERATION
@@ -204,7 +204,7 @@ We show two examples users should learn to avoid: Spline misfit (`ztobins` unabl
 ##Failure in  Density Estimation##
 We generate a sample with a complex and non sparse non null signal. We show how `ztobins` warns the user regarding failure in density estimation. A typical solution is to use more degrees of freedom in spline estimation.
 
-```{r,  fig.width=6, fig.height=4, fig.align='center'}
+```{r,  fig.width=8, fig.height=5, fig.align='center'}
 set.seed(1)
 p = 10000
 p1 = 1000
@@ -225,7 +225,7 @@ res$PlotWarnings
 
 The problem can be solved by using a higher number of degrees of freedom for spline estimation:
 
-```{r,  fig.width=6, fig.height=4, fig.align='center'}
+```{r,  fig.width=8, fig.height=5, fig.align='center'}
 res = ztobins(zmat = cbind(z1,z2), plot.diagnostics = F,df = 15, n.bins = 50)
 
 ```
@@ -233,7 +233,7 @@ res = ztobins(zmat = cbind(z1,z2), plot.diagnostics = F,df = 15, n.bins = 50)
 ##Non Normal Null: Identification through Q-Q- plots##
 We generate data where the null distribution is not standard normal, and show that this can be detected via the Q-Q plot.
 
-```{r,  fig.width=6, fig.height=4, fig.align='center'}
+```{r,  fig.width=8, fig.height=5, fig.align='center'}
 set.seed(1)
 p = 10000
 p1 = 50

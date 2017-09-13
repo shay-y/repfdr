@@ -364,13 +364,31 @@ diagnostics.plot=function(env = parent.frame()){
          xlab = 'Z. Scores',ylab='Counts',lty=1,ylim = c(0,max_y),type='l',col = 'green',lwd = 3)
     
     line_w = 3
+    x_limits = par("xaxp")[1:2]
+    y_limits = par("yaxp")[1:2]
     if(dim(pdf.binned.z[i,,])[2] == 3){
       lines(current_breaks,(pdf.binned.z[i,,1]) * proportions[1,i] * total_counts,col='red',lwd = line_w,lty=2)
       lines(current_breaks,(pdf.binned.z[i,,2]) * proportions[2,i] * total_counts ,col='blue',lwd = 2,lty=3)  
       lines(current_breaks,(pdf.binned.z[i,,3]) * proportions[3,i] * total_counts ,col='#e86609',lwd = line_w,lty=2)
+      legend( plot_max - 0.35*(plot_max-plot_min), max(counts_data) + 0.05*(max(counts_data)),
+              legend = c('Standard Normal','Mixture Density Est.','Left Cond. Density Est.','Right Cond. Density Est.','Obs. - # Null Exp.'),
+              col = c('blue','green','red','#e86609','pink'),
+              lwd = c(2,3,line_w,line_w,NA),
+              lty=c(3,1,2,2,NA),
+              pt.cex = c(1,1,1,1,2),
+              pch = c(NA,NA,NA,NA,15),
+              cex = 0.8)
     }else{
       lines(current_breaks,(pdf.binned.z[i,,1]) * proportions[1,i] * total_counts ,col='blue',lwd = 2,lty=3)
       lines(current_breaks,(pdf.binned.z[i,,2]) * proportions[2,i] * total_counts ,col='red',lwd = line_w,lty=2)
+      legend( plot_max - 0.35*(plot_max - plot_min), max(counts_data) + 0.05*(max(counts_data)),
+              legend = c('Standard Normal','Mixture Density Est.','Alternative Cond. Density Est.','Obs. - # Null Exp.'),
+              col = c('blue','green','red','pink'),
+              lwd = c(2,3,line_w,NA),
+              lty=c(3,1,2,NA),
+              pt.cex = c(1,1,1,2),
+              pch = c(NA,NA,NA,15),
+              cex = 0.8)
     }
     w=ztobins.res$PlotWarnings[i]
     if(!is.na(w)){
@@ -397,6 +415,9 @@ diagnostics.plot=function(env = parent.frame()){
     qqline(x,col='red')
     abline(0,1,col = 'black',lty=2,lwd=2)
     points(0,0,pch=20,cex=2,col='black')
+    
+    legend(x = -2,y = plot_max - 0.1* (plot_max - plot_min),legend = c('smoothed fit','normal QQline','diagonal line'),lwd = c(2,1,2),col = c('black','red','black'),lty = c(1,1,2))
+    
     #x_p = (rank(x) - 0.5)/length(x)
     #plot(sort(x_p),sort(pnorm(x)),xlab = 'Theoretical Uniform Quantiles',ylab = "Sample Quantiles",main = paste0('P-P plot, Study ',i),xlim = c(0,1),ylim = c(0,1),type='l',lwd = 1)
     #abline(a=0,b = 1,col='red',lty=2)
