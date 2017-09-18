@@ -1,8 +1,9 @@
 ztobins <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df = 7,
                     central.prop = 0.5,
-                    pi0=NULL,plot.diagnostics = F,
-                    trim.z=F,trim.z.upper = 8,trim.z.lower = -8, force.bin.number = F,
-                    pi.using.plugin = F, pi.plugin.lambda = 0.05){
+                    pi0=NULL,plot.diagnostics = FALSE,
+                    trim.z=FALSE,trim.z.upper = 8,trim.z.lower = -8,
+                    force.bin.number = FALSE,
+                    pi.using.plugin = FALSE, pi.plugin.lambda = 0.05){
   
   null.CDF.two.sided.pvalues = function(x){
     ret = pnorm(abs(x)) - pnorm(-1*abs(x))
@@ -13,15 +14,15 @@ ztobins <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df =
     backend.ztobins(zmat,n.association.status,n.bins,type,df,
             central.prop,pi0,plot.diagnostics,
             trim.z,trim.z.upper,trim.z.lower,force.bin.number,
-            null.CDF = null.CDF.two.sided.pvalues, one.sided.plot=F,
+            null.CDF = null.CDF.two.sided.pvalues, one.sided.plot=FALSE,
             pi.using.plugin, pi.plugin.lambda)
   )  
 }
 
 twosided.PValues.tobins <- function(pval.mat, n.bins = 120, type = 0, df = 7,
                                    central.prop = 0.5,
-                                   pi0=NULL,plot.diagnostics = F,
-                                   trim.z=F,trim.z.upper = 8,trim.z.lower = -8, force.bin.number = F,
+                                   pi0=NULL,plot.diagnostics = FALSE,
+                                   trim.z=FALSE,trim.z.upper = 8,trim.z.lower = -8, force.bin.number = FALSE,
                                    pi.plugin.lambda = 0.05){
   
   zmat = qnorm(1- 0.5 * pval.mat)
@@ -36,18 +37,18 @@ twosided.PValues.tobins <- function(pval.mat, n.bins = 120, type = 0, df = 7,
                     central.prop,
                     pi0,plot.diagnostics,
                     trim.z,trim.z.upper,trim.z.lower, force.bin.number,
-                    null.CDF = null.CDF.two.sided.pvalues, one.sided.plot=T,
-                    pi.using.plugin = T, pi.plugin.lambda)
+                    null.CDF = null.CDF.two.sided.pvalues, one.sided.plot=TRUE,
+                    pi.using.plugin = TRUE, pi.plugin.lambda)
   )
 
 }
 
 backend.ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type = 0, df = 7,
                      central.prop = 0.5,
-                     pi0=NULL,plot.diagnostics = F,
+                     pi0=NULL,plot.diagnostics = FALSE,
                      trim.z=F,trim.z.upper = 8,trim.z.lower = -8, force.bin.number = F,
-                     null.CDF = NULL, one.sided.plot=F,
-                     pi.using.plugin = F, pi.plugin.lambda = 0.05) 
+                     null.CDF = NULL, one.sided.plot=FALSE,
+                     pi.using.plugin = FALSE, pi.plugin.lambda = 0.05) 
 {
   if(is.null(null.CDF)){
     null.CDF = function(x){
@@ -144,7 +145,7 @@ backend.ztobins  <- function(zmat, n.association.status = 3, n.bins = 120, type 
   for (i in 1:n.studies)
     {
     skip_study = F
-    ### parts of the code here are adopted from locfdr function (package locfdr by Bradley Efron)
+    ### This portion is adapted from the locfdr function in the locfdr package.
     
     ## density's estimation
     breaks <- seq(min(zmat[,i]), max(zmat[,i]), length = n.bins)

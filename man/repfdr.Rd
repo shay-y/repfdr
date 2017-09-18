@@ -85,8 +85,63 @@ Ruth Heller, Shachar Kaufman, Shay Yaacoby, Barak Brill, Daniel Yekutieli.
 }
 
 \examples{
+
 #### Example 1: a simulation; each feature in each study has two association states,
-####            null and positive:
+####            null and positive, prior is known
+#This example generates the Z scores for two studies, with 0.05 probability to have
+# non - null signal in each study.
+# The prior matrix is being pregenerated to show the optimal values.
+# if this matrix was not supplied, the repfdr method would estimate it
+# using an EM algorithm. See the next examples for estimating the prior as well using repfdr.
+
+set.seed(1)
+n = 2 #two studies
+m=10000 # ten thounsand, SNPs
+H_Study_1 = rbinom(m,1,prob = 0.05) #signal of 1, for SNPS with association in the first study
+H_Study_2 = rbinom(m,1,prob = 0.05) #signal of 1, for SNPS with association in the second study
+Zmat = matrix(rnorm(n*m),nrow = m) #generate matrix
+
+#insert signal (mean shift of 3) for the first study
+Zmat[which(H_Study_1==1),1] = Zmat[which(H_Study_1==1),1]  + 4 
+
+#insert signal to the second study
+Zmat[which(H_Study_2==1),2] = Zmat[which(H_Study_2==1),2]  + 4 
+
+#estimate densities via ztobins:
+ztobins_res = ztobins(Zmat,n.association.status = 2,plot.diagnostics = FALSE,n.bin= 100) 
+
+#writing out the prior explicitly. If this was not supplied, 
+#the repfdr would try to estimate this prior from the data.
+Precomputed_Pi = matrix(NA,ncol = 3,nrow = 4)
+Precomputed_Pi[,1] = c(0,1,0,1)
+Precomputed_Pi[,2] = c(0,0,1,1)
+Precomputed_Pi[,3] = c(0.95^2,0.95*0.05,0.95*0.05,0.05^2)
+colnames(Precomputed_Pi) = c('Study 1','Study 2','Pi')
+
+#run repfdr
+repfdr_res = repfdr(ztobins_res$pdf.binned.z,
+                    ztobins_res$binned.z.mat,
+                    non.null = 'replication',
+                    Pi.previous.result = Precomputed_Pi)
+
+#The precomputed prior matrix. if this would not 
+repfdr_res$Pi
+
+#local fdr0 and Fdr for each SNP
+head(repfdr_res$mat)
+
+Non_Null = which(H_Study_1 ==1 & H_Study_2 == 1)
+Reported = which(repfdr_res$mat[,2] <= 0.05)
+TP = length(intersect(Reported,  Non_Null))
+TP
+FP = length(Reported) - TP
+FP
+FN = length(Non_Null - TP)
+FN
+
+
+#### Example 2: a simulation; each feature in each study has two association states,
+####            null and positive, prior is estimated
 \dontrun{
 # a) Replicablity analysis:
 data(binned_zmat_sim) # this loads the binned z-scores as well as the (estimated) probabilities
@@ -123,7 +178,7 @@ sum(Rej * !true.assoc) / sum(true.assoc)
 }
 
 \dontrun{
-#### Example 2: SNPs data; each SNP in each study has three association states,
+#### Example 3: SNPs data; each SNP in each study has three association states,
 ####            negative, null, or positive: 
 
 # load the bins of the z-scores and their probabilities.

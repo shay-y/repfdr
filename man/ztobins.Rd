@@ -12,9 +12,10 @@ The function can plot diagnostic plots (disabled by default) for model fit. Thes
 \usage{
 ztobins(zmat, n.association.status = 3, n.bins = 120, type = 0, df = 7,
                     central.prop = 0.5,
-                    pi0=NULL,plot.diagnostics = F,
-                    trim.z=F,trim.z.upper = 8,trim.z.lower = -8, force.bin.number = F,
-                    pi.using.plugin = F, pi.plugin.lambda = 0.05)
+                    pi0=NULL,plot.diagnostics = FALSE,
+                    trim.z=FALSE,trim.z.upper = 8,trim.z.lower = -8,
+                    force.bin.number = FALSE,
+                    pi.using.plugin = FALSE, pi.plugin.lambda = 0.05)
 }
 \arguments{
   \item{zmat}{
@@ -106,24 +107,9 @@ Vector of size \code{ncol{zmat}}, keeping the warnings given for each study (ava
 \code{\link{repfdr}}
 }
 \examples{
-\dontrun{
 
-# three association states case (H in {-1,0,1}):
-download.file('http://www.math.tau.ac.il/~ruheller/repfdr_RData/zmat.RData',destfile = "zmat.RData")
-load(file = "zmat.RData")
-
-input.to.repfdr3 <- ztobins(zmat, 3, df = 15)
-pbz    <- input.to.repfdr3$pdf.binned.z
-bz     <- input.to.repfdr3$binned.z.mat
-
-# two association states case (H in {0,1}):
-data(zmat_sim)
-
-input.to.repfdr <- ztobins(zmat_sim, 2, n.bins = 100 ,plot.diagnostics = T)
-pbz_sim    <- input.to.repfdr$pdf.binned.z
-bz_sim     <- input.to.repfdr$binned.z.mat
-
-# using the plug in estimator for the proportion of null hypotheses:
+# Simulated example using both the central proportion estimator 
+# and the plug in estimator for the proportion of null hypotheses:
 
 set.seed(1)
 p = 10000
@@ -143,13 +129,31 @@ hist(z2)
 zmat.example = cbind(z1,z2)
 
 ztobins.res = ztobins(zmat.example,
-                      plot.diagnostics = T)
+                      plot.diagnostics = TRUE)
 ztobins.res$proportions
 
 ztobins.res.plugin.estimator = ztobins(zmat.example,
-                           pi.using.plugin = T,
-                           plot.diagnostics = T)
+                           pi.using.plugin = TRUE,
+                           plot.diagnostics = TRUE)
 
 ztobins.res.plugin.estimator$proportions
+
+\dontrun{
+
+# three association states case (H in {-1,0,1}):
+download.file('http://www.math.tau.ac.il/~ruheller/repfdr_RData/zmat.RData',destfile = "zmat.RData")
+load(file = "zmat.RData")
+
+input.to.repfdr3 <- ztobins(zmat, 3, df = 15)
+pbz    <- input.to.repfdr3$pdf.binned.z
+bz     <- input.to.repfdr3$binned.z.mat
+
+# two association states case (H in {0,1}):
+data(zmat_sim)
+
+input.to.repfdr <- ztobins(zmat_sim, 2, n.bins = 100 ,plot.diagnostics = T)
+pbz_sim    <- input.to.repfdr$pdf.binned.z
+bz_sim     <- input.to.repfdr$binned.z.mat
 }
+
 }

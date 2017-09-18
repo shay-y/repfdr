@@ -12,9 +12,9 @@ The function can plot diagnostic plots (disabled by default) for model fit. Thes
 \usage{
 twosided.PValues.tobins(pval.mat, n.bins = 120, type = 0, df = 7,
                                    central.prop = 0.5,
-                                   pi0=NULL,plot.diagnostics = F,
-                                   trim.z=F,trim.z.upper = 8,
-                                   trim.z.lower = -8, force.bin.number = F,
+                                   pi0=NULL,plot.diagnostics = FALSE,
+                                   trim.z=FALSE,trim.z.upper = 8,
+                                   trim.z.lower = -8, force.bin.number = FALSE,
                                    pi.plugin.lambda = 0.05)
 }
 \arguments{
@@ -101,7 +101,7 @@ Vector of size \code{ncol{zmat}}, keeping the warnings given for each study (ava
 \code{\link{repfdr}}
 }
 \examples{
-\dontrun{
+
 # we generate a dataset with p=10000 pvalues for two studies,
 # p1=300 of which are non null:
 set.seed(1)
@@ -117,9 +117,8 @@ zmat.example = cbind(z1,z2)
 pmat.example = 1-(pnorm(abs(zmat.example)) - pnorm(-1*abs(zmat.example)))
 
 twosided.pval.res = twosided.PValues.tobins(pmat.example,
-                                            plot.diagnostics = T)
+                                            plot.diagnostics = TRUE)
 
 twosided.pval.res$proportions
 
-}
 }
